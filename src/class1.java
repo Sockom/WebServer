@@ -7,14 +7,14 @@ public class class1 {
 
     public class1() throws SQLException {
         DriverManager.registerDriver(new com.microsoft.sqlserver.jdbc.SQLServerDriver());
-        String dbURL = "jdbc:sqlserver://DESKTOP-P2FRPBU\\MSSQLSERVER;user=Host;password=1234";
+        String dbURL = "jdbc:sqlserver://DESKTOP-P2FRPBU\\MSSQLSERVER;user=Host;password=1234database=GrowBroDWH";
         Connection connection = DriverManager.getConnection(dbURL);
         if (connection != null){
             System.out.println("Connected");
         }
-
-        connection.prepareStatement("insert into stage.DimEjer " + "VALUES ('Kaspers')").execute();
+        connection.prepareStatement("insert into stage.DimEjer " + "VALUES ('Kasp')").execute();
         connection.close();
+        System.out.println("Connection closed");
 
     }
 }
