@@ -2,21 +2,16 @@ import java.io.Serializable;
 
 public class Message implements Serializable
 {
-  private int command;
+  private String command;
   private String json;
 
-  public Message(int command, String json)
-  {
-    this.command = command;
-    this.json = json;
-  }
 
-  public int getCommand()
+  public String getCommand()
   {
     return command;
   }
 
-  public void setCommand(int command)
+  public void setCommand(String command)
   {
     this.command = command;
   }

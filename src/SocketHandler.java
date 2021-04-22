@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.sql.SQLException;
 
 public class SocketHandler implements Runnable
 {
@@ -11,13 +12,15 @@ public class SocketHandler implements Runnable
   private OutputStream outputStream;
   private Gson gson;
   private Socket socket;
+  private DBAccess dbAccess;
 
-  public SocketHandler(Socket socket) throws IOException
+  public SocketHandler(Socket socket) throws IOException, SQLException
   {
     inputStream = socket.getInputStream();
     outputStream = socket.getOutputStream();
     this.socket = socket;
     gson = new Gson();
+    dbAccess = new DBAccess();
 
   }
 
@@ -33,15 +36,15 @@ public class SocketHandler implements Runnable
 
       switch(message.getCommand())
       {
-        case 1:
-          byte[] bytes = sendStatus(1, "TILLYKKE");
+        case "GETCURRENTDATA":
+          String[] split = message.getJson().split(":");
+          int userid = Integer.parseInt(split[0]);
+          int greenhouseid = Integer.parseInt(split[1]);
+          double CO2 = dbAccess.DBGetCurrentData(userid, greenhouseid);
+          byte[] bytes = sendStatus("SUCCESS", ""+CO2);
           outputStream.write(bytes, 0, bytes.length);
           break;
 
-        /*case 1:
-          byte[] bytes = sendStatus(Enum.SUCCESS, "TILLYKKE");
-          outputStream.write(bytes, 0, bytes.length);
-          break;*/
       }
     }
     catch (IOException e)
@@ -51,9 +54,11 @@ public class SocketHandler implements Runnable
 
   }
 
-  private byte[] sendStatus(int e, String string)
+  private byte[] sendStatus(String e, String string)
   {
-    Message message = new Message(e, string);
+    Message message = new Message();
+    message.setCommand(e);
+    message.setJson(string);
     String serialize = gson.toJson(message);
     return serialize.getBytes();
   }
