@@ -2,6 +2,8 @@
   <library name="enu">
     <CLASSES>
       <root url="file://$PROJECT_DIR$/../Libraries/sqljdbc_9.2/enu" />
+      <root url="file://$PROJECT_DIR$/../SEP4/sqljdbc_9.2/enu" />
+      <root url="jar://$PROJECT_DIR$/../../3. Semester/gson-2.8.2.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
@@ -14,7 +16,17 @@
       <root url="file://$PROJECT_DIR$/../Libraries/sqljdbc_9.2/enu/samples/datatypes" />
       <root url="file://$PROJECT_DIR$/../Libraries/sqljdbc_9.2/enu/samples/resultsets" />
       <root url="file://$PROJECT_DIR$/../Libraries/sqljdbc_9.2/enu/samples/sparse" />
+      <root url="file://$PROJECT_DIR$/../SEP4/sqljdbc_9.2/enu/samples/adaptive" />
+      <root url="file://$PROJECT_DIR$/../SEP4/sqljdbc_9.2/enu/samples/alwaysencrypted" />
+      <root url="file://$PROJECT_DIR$/../SEP4/sqljdbc_9.2/enu/samples/azureactivedirectoryauthentication" />
+      <root url="file://$PROJECT_DIR$/../SEP4/sqljdbc_9.2/enu/samples/connections" />
+      <root url="file://$PROJECT_DIR$/../SEP4/sqljdbc_9.2/enu/samples/constrained" />
+      <root url="file://$PROJECT_DIR$/../SEP4/sqljdbc_9.2/enu/samples/dataclassification" />
+      <root url="file://$PROJECT_DIR$/../SEP4/sqljdbc_9.2/enu/samples/datatypes" />
+      <root url="file://$PROJECT_DIR$/../SEP4/sqljdbc_9.2/enu/samples/resultsets" />
+      <root url="file://$PROJECT_DIR$/../SEP4/sqljdbc_9.2/enu/samples/sparse" />
     </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/../Libraries/sqljdbc_9.2/enu" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../SEP4/sqljdbc_9.2/enu" recursive="false" />
   </library>
 </component>
