@@ -7,6 +7,7 @@ public class Main {
 
     public static void main(String[] args) throws SQLException
     {
+        SensorData mockData = new SensorData();
         DBAccess test = new DBAccess();
         try
         {
