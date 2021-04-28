@@ -37,13 +37,28 @@ public class SocketHandler implements Runnable
       switch(message.getCommand())
       {
         case "GETCURRENTDATA":
+        {
           String[] split = message.getJson().split(":");
           int userid = Integer.parseInt(split[0]);
           int greenhouseid = Integer.parseInt(split[1]);
           double CO2 = dbAccess.DBGetCurrentData(userid, greenhouseid);
-          byte[] bytes = sendStatus("SUCCESS", ""+CO2);
+          byte[] bytes = sendStatus("SUCCESS", "" + CO2);
           outputStream.write(bytes, 0, bytes.length);
           break;
+        }
+
+        case "GETUSER":
+        {
+          String[] split = message.getJson().split(":");
+          String username = split[0];
+          String password = split[1];
+          User user = dbAccess.DBGetUser(username,password);
+          System.out.println(user.getUsername());
+          String stringSerialized = gson.toJson(user);
+          byte[] bytes = sendStatus("SUCCCES", stringSerialized);
+          outputStream.write(bytes,0,bytes.length);
+          break;
+        }
 
       }
     }
