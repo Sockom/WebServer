@@ -51,6 +51,7 @@ public class DBAccess
 
     public int insertSensorDataToStage(SensorData sensorData) {
         Connection connection = getConnection();
-
+        return 1;
     }
+
 }
