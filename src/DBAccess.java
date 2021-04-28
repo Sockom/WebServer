@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.List;
 
 public class DBAccess
 {
@@ -45,6 +46,36 @@ public class DBAccess
       }
       return -1;
     }
+    public User DBGetUser(String username,String password)
+    {
+      try
+      {
+        Connection connection = getConnection();
+        PreparedStatement statement = connection.prepareStatement("Select * from edwh.DimEjer where Username=? and Password=?");
+        statement.setString(1,username);
+        statement.setString(2,password);
+
+        ResultSet resultSet = statement.executeQuery();
+        User user;
+        int userId = 0;
+        String usernameFromDB = "";
+        String passwordFromDB = "";
+        if (resultSet.next())
+        {
+          userId = resultSet.getInt("UserID");
+          usernameFromDB = resultSet.getString("Username");
+          passwordFromDB = resultSet.getString("Password");
+        }
+        user = new User(userId,usernameFromDB,passwordFromDB);
+        return user;
+      }
+      catch (SQLException e)
+      {
+        e.printStackTrace();
+      }
+      return null;
+    }
+
 
     public int insertSensorDataToStage(SensorData sensorData) {
         Connection connection = getConnection();
