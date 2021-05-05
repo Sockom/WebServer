@@ -9,7 +9,7 @@ public class Main {
     {
         SensorData sensorData = new SensorData();
         DBAccess test = new DBAccess();
-        test.insertSensorDataToStage(sensorData);
+        test.insertSensorDataTodbo(sensorData);
         try
         {
             ServerSocket welcomeSocket = new ServerSocket(6969);

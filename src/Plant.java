@@ -6,9 +6,10 @@ public class Plant
   private float HumidityRequirement;
   private float TemperatureRequirement;
   private float CO2Requirement;
+  private int DrivhusID;
 
   public Plant(int id, String name, int plantScore, float humidityRequirement,
-      float temperatureRequirement, float CO2Requirement)
+      float temperatureRequirement, float CO2Requirement, int drivhusID)
   {
     Id = id;
     Name = name;
@@ -16,6 +17,7 @@ public class Plant
     HumidityRequirement = humidityRequirement;
     TemperatureRequirement = temperatureRequirement;
     this.CO2Requirement = CO2Requirement;
+    DrivhusID = drivhusID;
   }
 
   public int getId()
@@ -76,5 +78,9 @@ public class Plant
   public void setCO2Requirement(float CO2Requirement)
   {
     this.CO2Requirement = CO2Requirement;
+  }
+
+  public int getDrivhusID() {
+    return DrivhusID;
   }
 }

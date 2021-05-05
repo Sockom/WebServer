@@ -8,9 +8,10 @@ public class Greenhouse
   private float Temperature;
   private float CO2;
   private float Humidity;
+  private int UserID;
 
   public Greenhouse(int id, String name, float temperature,
-      float CO2, float humidity)
+      float CO2, float humidity, int userID)
   {
     Plants = new ArrayList();
     Id = id;
@@ -18,6 +19,7 @@ public class Greenhouse
     Temperature = temperature;
     this.CO2 = CO2;
     Humidity = humidity;
+    UserID = userID;
   }
 
   public void AddPlant(Plant plant)
@@ -88,5 +90,9 @@ public class Greenhouse
   public void setHumidity(float humidity)
   {
     Humidity = humidity;
+  }
+
+  public int getUserID() {
+    return UserID;
   }
 }
