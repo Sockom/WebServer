@@ -132,7 +132,7 @@ public class DBAccess
             statement = connection
             .prepareStatement("INSERT INTO dbo.Plant (Navn, DrivhusID) VALUES ( ?, ?)");
             statement.setString(1, plant.getName());
-            statement.setInt(2, plant.getDrivhusID());
+            statement.setInt(2, plant.getGreenHouseID());
             statement.execute();
             if(updateStage() == 1) {
                 updateEDWH();
