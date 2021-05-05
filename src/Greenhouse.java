@@ -1,23 +1,33 @@
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class Greenhouse
 {
-  private ArrayList Plants;
-  private int Id;
+  private ArrayList<Plant> Plants;
+  private int greenHouseID;
+  private int userID;
   private String Name;
-  private float Temperature;
-  private float CO2;
-  private float Humidity;
+  private int waterFrequency;
+  private double waterVolume;
+  private String waterTimeOfDay;
+  private Timestamp lastWaterDay;
+  private Timestamp lastMeasurement;
+  private ArrayList<SensorDataFromAndroid> sensorData;
 
-  public Greenhouse(int id, String name, float temperature,
-      float CO2, float humidity)
+
+  public Greenhouse(String name, int greenHouseID,int userID,ArrayList<Plant> plants,
+      int waterFrequency,double waterVolume,String waterTimeOfDay,Timestamp lastWaterDay,ArrayList<SensorDataFromAndroid> sensorData)
   {
     Plants = new ArrayList();
-    Id = id;
+    this.greenHouseID = greenHouseID;
     Name = name;
-    Temperature = temperature;
-    this.CO2 = CO2;
-    Humidity = humidity;
+    this.userID = userID;
+    this.Plants = plants;
+    this.waterFrequency = waterFrequency;
+    this.waterVolume = waterVolume;
+    this.waterTimeOfDay = waterTimeOfDay;
+    this.lastWaterDay = lastWaterDay;
+    this.sensorData = sensorData;
   }
 
   public void AddPlant(Plant plant)
@@ -30,24 +40,34 @@ public class Greenhouse
     Plants.remove(plant);
   }
 
-  public ArrayList getPlants()
+  public ArrayList<Plant> getPlants()
   {
     return Plants;
   }
 
-  public void setPlants(ArrayList plants)
+  public void setPlants(ArrayList<Plant> plants)
   {
     Plants = plants;
   }
 
-  public int getId()
+  public int getGreenHouseID()
   {
-    return Id;
+    return greenHouseID;
   }
 
-  public void setId(int id)
+  public void setGreenHouseID(int greenHouseID)
   {
-    Id = id;
+    this.greenHouseID = greenHouseID;
+  }
+
+  public int getUserID()
+  {
+    return userID;
+  }
+
+  public void setUserID(int userID)
+  {
+    this.userID = userID;
   }
 
   public String getName()
@@ -60,33 +80,63 @@ public class Greenhouse
     Name = name;
   }
 
-  public float getTemperature()
+  public int getWaterFrequency()
   {
-    return Temperature;
+    return waterFrequency;
   }
 
-  public void setTemperature(float temperature)
+  public void setWaterFrequency(int waterFrequency)
   {
-    Temperature = temperature;
+    this.waterFrequency = waterFrequency;
   }
 
-  public float getCO2()
+  public double getWaterVolume()
   {
-    return CO2;
+    return waterVolume;
   }
 
-  public void setCO2(float CO2)
+  public void setWaterVolume(double waterVolume)
   {
-    this.CO2 = CO2;
+    this.waterVolume = waterVolume;
   }
 
-  public float getHumidity()
+  public String getWaterTimeOfDay()
   {
-    return Humidity;
+    return waterTimeOfDay;
   }
 
-  public void setHumidity(float humidity)
+  public void setWaterTimeOfDay(String waterTimeOfDay)
   {
-    Humidity = humidity;
+    this.waterTimeOfDay = waterTimeOfDay;
+  }
+
+  public Timestamp getLastWaterDay()
+  {
+    return lastWaterDay;
+  }
+
+  public void setLastWaterDay(Timestamp lastWaterDay)
+  {
+    this.lastWaterDay = lastWaterDay;
+  }
+
+  public Timestamp getLastMeasurement()
+  {
+    return lastMeasurement;
+  }
+
+  public void setLastMeasurement(Timestamp lastMeasurement)
+  {
+    this.lastMeasurement = lastMeasurement;
+  }
+
+  public ArrayList<SensorDataFromAndroid> getSensorData()
+  {
+    return sensorData;
+  }
+
+  public void setSensorData(ArrayList<SensorDataFromAndroid> sensorData)
+  {
+    this.sensorData = sensorData;
   }
 }
