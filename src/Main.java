@@ -7,8 +7,9 @@ public class Main {
 
     public static void main(String[] args) throws SQLException
     {
-        SensorData mockData = new SensorData();
+        SensorData sensorData = new SensorData();
         DBAccess test = new DBAccess();
+        test.insertSensorDataToStage(sensorData);
         try
         {
             ServerSocket welcomeSocket = new ServerSocket(6969);

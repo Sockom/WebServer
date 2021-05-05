@@ -12,15 +12,12 @@ public class DBAccess
         }
 
         public Connection getConnection() {
-            String dbURL = "jdbc:sqlserver://DESKTOP-HFHHMQP\\MSSQLSERVER;user=Host;password=1234;database=GrowBroDWH";//K:SMPCJNQ Mk:P2FRPBU KH:ASU6SHH MB:HFHHMQP
+            String dbURL = "jdbc:sqlserver://DESKTOP-P2FRPBU\\MSSQLSERVER;user=Host;password=1234;database=GrowBroDWH";//K:SMPCJNQ Mk:P2FRPBU KH:ASU6SHH
             Connection connection = null;
             try {
                 connection = DriverManager.getConnection(dbURL);
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
-            }
-            if (connection != null){
-                System.out.println("Connected");
             }
             return connection;
         }
@@ -82,7 +79,60 @@ public class DBAccess
 
     public int insertSensorDataToStage(SensorData sensorData) {
         Connection connection = getConnection();
-        return 1;
+        try {
+            PreparedStatement statement = connection
+            .prepareStatement("INSERT INTO stage.FactManagement (DrivhusID, [Time], CO2, Temperatur, Fugtighed, UserID, PlanteID) VALUES ( ?, ?, ?, ?, ?, ?, ?)");
+            for( int i = 0 ; i < sensorData.getNumberOf() ; i++){
+            statement.setInt(1, sensorData.getDrivhusID());
+            statement.setTimestamp(2, sensorData.getTimestamps()[i]);
+            statement.setInt(3, sensorData.getCO2()[i]);
+            statement.setInt(4, sensorData.getTemperatur()[i]);
+            statement.setInt(5, sensorData.getLuftfugtighed()[i]);
+            statement.setInt(6, getUserID(sensorData.getDrivhusID()));
+            statement.setInt(7, getPlantID(sensorData.getDrivhusID()));
+            statement.execute();}
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return 1;}
+
+
+    public int getUserID(int drivhusID){
+            Connection connection = getConnection();
+        PreparedStatement statement = null;
+        try {
+            statement = connection
+        .prepareStatement("select UserID from dbo.Drivhus where DrivhusID = ?");
+            statement.setInt(1, drivhusID);
+            ResultSet r = statement.executeQuery();
+            int tal = 0;
+            if(r.next()){
+               tal = r.getInt("UserID");
+            }
+            return tal;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return -1;
     }
 
+
+    public int getPlantID(int drivhusID){
+        Connection connection = getConnection();
+        PreparedStatement statement = null;
+        try {
+            statement = connection
+                    .prepareStatement("select PlanteID from dbo.Plante where DrivhusID = ?");
+            statement.setInt(1, drivhusID);
+            ResultSet r = statement.executeQuery();
+            int tal = 0;
+            if(r.next()){
+                tal = r.getInt("PlanteID");
+            }
+            return tal;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return -1;
+    }
 }
