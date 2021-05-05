@@ -1,6 +1,7 @@
 public class Plant
 {
-  private int Id;
+  private int plantID;
+  private int greenHouseID;
   private String Name;
   private int PlantScore;
   private float HumidityRequirement;
@@ -11,7 +12,8 @@ public class Plant
   public Plant(int id, String name, int plantScore, float humidityRequirement,
       float temperatureRequirement, float CO2Requirement, int drivhusID)
   {
-    Id = id;
+    plantID = id;
+    this.greenHouseID = greenHouseID;
     Name = name;
     PlantScore = plantScore;
     HumidityRequirement = humidityRequirement;
@@ -20,14 +22,24 @@ public class Plant
     DrivhusID = drivhusID;
   }
 
-  public int getId()
+  public int getPlantID()
   {
-    return Id;
+    return plantID;
   }
 
-  public void setId(int id)
+  public void setPlantID(int plantID)
   {
-    Id = id;
+    this.plantID = plantID;
+  }
+
+  public int getGreenHouseID()
+  {
+    return greenHouseID;
+  }
+
+  public void setGreenHouseID(int greenHouseID)
+  {
+    this.greenHouseID = greenHouseID;
   }
 
   public String getName()
