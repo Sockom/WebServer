@@ -175,7 +175,7 @@ public class DBAccess
             statement.setFloat(3, plant.getTemperatureRequirement());
             statement.setFloat(4, plant.getCO2Requirement());
             statement.setFloat(5, plant.getHumidityRequirement());
-            statement.setInt(6, plant.getId());
+            statement.setInt(6, plant.getPlantID());
             statement.execute();
             if(updateStage() == 1) {
                 updateEDWH();
@@ -213,7 +213,7 @@ public class DBAccess
                     .prepareStatement("INSERT INTO dbo.Drivhus (Navn, UserID) VALUES ( ?, ?) WHERE (DrivhusID = ?)");
             statement.setString(1, greenhouse.getName());
             statement.setInt(2, greenhouse.getUserID());
-            statement.setInt(3, greenhouse.getId());
+            statement.setInt(3, greenhouse.getGreenHouseID());
             statement.execute();
             if(updateStage() == 1){
             updateEDWH();
