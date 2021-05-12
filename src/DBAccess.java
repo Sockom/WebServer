@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @SuppressWarnings("SqlDialectInspection")
@@ -119,6 +120,24 @@ public class DBAccess
             return -1;
         }
         return 1;}
+
+    public int insertSensorDataTodbo(int id,double co2,double humidity,double temperature){
+        Connection connection = getConnection();
+        try {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO dbo.Drivhus (DrivhusID, [Time], CO2, Temperatur, Fugtighed) VALUES ( ?, ?, ?, ?, ?)");
+
+            statement.setInt(1,id);
+            statement.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            statement.setDouble(3, co2);
+            statement.setDouble(4, humidity);
+            statement.setDouble(5, temperature);
+            statement.execute();
+
+            } catch (SQLException e) {
+            return -1;
+        };
+        return 1;
+    }
 
 
 

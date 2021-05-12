@@ -17,6 +17,7 @@ public class Main {
             WebSocketClient webSocketClient = new WebSocketClient("wss://iotnet.cibicom.dk/app?token=vnoTvwAAABFpb3RuZXQuY2liaWNvbS5kazR2J0Aa7A9xrXbjCeaG1bU=");
 
 
+
             while(true)
             {
                 Socket connections = welcomeSocket.accept();

@@ -15,6 +15,7 @@ public class WebSocketClient implements WebSocket.Listener {
     private WebSocket server = null;
     private Gson gson;
     private ByteBuffer fix;
+    private DBAccess dbAccess;
 
     // Send down-link message to device
     // Must be in Json format according to https://github.com/ihavn/IoT_Semester_project/blob/master/LORA_NETWORK_SERVER.md
@@ -28,6 +29,7 @@ public class WebSocketClient implements WebSocket.Listener {
         HttpClient client = HttpClient.newHttpClient();
         CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
                 .buildAsync(URI.create(url), this);
+        dbAccess = new DBAccess();
         gson = new Gson();
         fix= ByteBuffer.allocate(5);
         server = ws.join();
@@ -81,9 +83,32 @@ public class WebSocketClient implements WebSocket.Listener {
     }
     //onText()
     public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
-        String indented = gson.toJson(data);
-        System.out.println(indented);
+        String idHex=data.subSequence(0,3).toString();
+        String co2Hex= data.subSequence(4,7).toString();
+        String humidityHex= data.subSequence(8,11).toString();
+        String temperatureHex= data.subSequence(12,15).toString();
+        int id= Integer.parseInt(idHex,16);
+        double co2= hexToDouble(co2Hex);
+        double humidity= hexToDouble(humidityHex);
+        double temperature= hexToDouble(temperatureHex);
+        dbAccess.insertSensorDataTodbo(id,co2,humidity,temperature);
+        //System.out.println(indented);
         webSocket.request(1);
         return new CompletableFuture().completedFuture("onText() completed.").thenAccept(System.out::println);
+    }
+
+    private double hexToDouble(String hex){
+        long longedHex =parseUnsignedHex(hex);
+        double doubledHex=Double.longBitsToDouble(longedHex);
+        return doubledHex;
+
+    }
+
+    private static long parseUnsignedHex(String text) {
+        if (text.length() == 16) {
+            return (parseUnsignedHex(text.substring(0, 1)) << 60)
+                    | parseUnsignedHex(text.substring(1));
+        }
+        return Long.parseLong(text, 16);
     }
 }
