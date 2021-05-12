@@ -41,8 +41,9 @@ public class SocketHandler implements Runnable
           String[] split = message.getJson().split(":");
           int userid = Integer.parseInt(split[0]);
           int greenhouseid = Integer.parseInt(split[1]);
-          double CO2 = dbAccess.DBGetCurrentData(userid, greenhouseid);
-          byte[] bytes = sendStatus("SUCCESS", "" + CO2);
+          ApiCurrentDataPackage aPackage = dbAccess.DBGetCurrentData(userid, greenhouseid);
+          String stringSerialized = gson.toJson(aPackage);
+          byte[] bytes = sendStatus("SUCCESS", "" + stringSerialized);
           outputStream.write(bytes, 0, bytes.length);
           break;
         }

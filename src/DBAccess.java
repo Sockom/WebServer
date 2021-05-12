@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("SqlDialectInspection")
@@ -23,29 +24,43 @@ public class DBAccess
             }
             return connection;
         }
-    public double DBGetCurrentData(int userID, int greenhouseid){
+    public ApiCurrentDataPackage DBGetCurrentData(int userID, int greenhouseid){
 
       try
       {
         Connection connection = getConnection();
         PreparedStatement statement = connection
-            .prepareStatement("select CO2 from edwh.FactManagement where U_ID = ? and DH_ID = ?");
+            .prepareStatement("select * from edwh.FactManagement where U_ID = ? and DH_ID = ?");
         statement.setInt(1, userID);
         statement.setInt(2, greenhouseid);
 
         ResultSet resultSet = statement.executeQuery();
         double CO2 = 0;
+        double temperatur = 0;
+        double fugtighed = 0;
+        Timestamp time = null;
         if (resultSet.next())
         {
           CO2 = resultSet.getDouble("CO2");
+          temperatur = resultSet.getDouble("Temperatur");
+          fugtighed = resultSet.getDouble("Fugtighed");
+          time = resultSet.getTimestamp("Time");
         }
-        return CO2;
+        DataContainer CO2data = new DataContainer(CO2,DataType.CO2);
+        DataContainer temperaturData = new DataContainer(temperatur,DataType.TEMPERATURE);
+        DataContainer fugtighedData = new DataContainer(fugtighed,DataType.HUMIDITY);
+        List<DataContainer> list = new ArrayList<>();
+        list.add(CO2data);
+        list.add(temperaturData);
+        list.add(fugtighedData);
+        ApiCurrentDataPackage apiCurrentDataPackage = new ApiCurrentDataPackage(list,time);
+        return apiCurrentDataPackage;
       }
         catch (SQLException e)
       {
         e.printStackTrace();
       }
-      return -1;
+      return null;
     }
     public User DBGetUser(String username,String password)
     {
