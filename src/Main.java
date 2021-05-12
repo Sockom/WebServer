@@ -14,7 +14,7 @@ public class Main {
         {
             ServerSocket welcomeSocket = new ServerSocket(6969);
             System.out.println("Serveren er startet");
-            WebSocketClient webSocketClient = new WebSocketClient("wss://iotnet.cibicom.dk/app?token=vnoRiQAAABFpb3RuZXQuY2liaWNvbS5kazW4TuTywnWWgPhfHgFGHi8=");
+            WebSocketClient webSocketClient = new WebSocketClient("wss://iotnet.cibicom.dk/app?token=vnoTvwAAABFpb3RuZXQuY2liaWNvbS5kazR2J0Aa7A9xrXbjCeaG1bU=");
 
 
             while(true)
