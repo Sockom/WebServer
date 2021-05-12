@@ -14,7 +14,7 @@ public class DBAccess
 // Start of establishing connection
 
         public Connection getConnection() {
-            String dbURL = "jdbc:sqlserver://DESKTOP-P2FRPBU\\MSSQLSERVER;user=Host;password=1234;database=GrowBroDWH";//K:SMPCJNQ Mk:P2FRPBU KH:ASU6SHH
+            String dbURL = "jdbc:sqlserver://DESKTOP-SMPCJNQ\\MSSQLSERVER;user=Host;password=1234;database=GrowBroDWH";//K:SMPCJNQ Mk:P2FRPBU KH:ASU6SHH
             Connection connection = null;
             try {
                 connection = DriverManager.getConnection(dbURL);

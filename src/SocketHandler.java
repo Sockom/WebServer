@@ -4,7 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.WebSocket;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+import static java.lang.Thread.sleep;
 
 public class SocketHandler implements Runnable
 {
@@ -13,13 +20,15 @@ public class SocketHandler implements Runnable
   private Gson gson;
   private Socket socket;
   private DBAccess dbAccess;
+  private WebSocketClient wSC;
 
-  public SocketHandler(Socket socket) throws IOException, SQLException
+  public SocketHandler(Socket socket, WebSocketClient webSocketClient) throws IOException, SQLException
   {
     inputStream = socket.getInputStream();
     outputStream = socket.getOutputStream();
     this.socket = socket;
     gson = new Gson();
+    wSC=webSocketClient;
     dbAccess = new DBAccess();
 
   }
@@ -32,6 +41,7 @@ public class SocketHandler implements Runnable
       int read = inputStream.read(lenbytes, 0, lenbytes.length);
       String data = new String(lenbytes, 0, read);
       System.out.println(data);
+      //startGetDataThread("wss://iotnet.cibicom.dk/app?token=vnoRiQAAABFpb3RuZXQuY2liaWNvbS5kazW4TuTywnWWgPhfHgFGHi8=");
       Message message = gson.fromJson(data, Message.class);
 
       switch(message.getCommand())
@@ -59,6 +69,10 @@ public class SocketHandler implements Runnable
           outputStream.write(bytes,0,bytes.length);
           break;
         }
+        case "WATERNOW":
+        {
+          wSC.sendDownLink(gson.toJson("waternow"));
+        }
 
       }
     }
@@ -76,5 +90,22 @@ public class SocketHandler implements Runnable
     message.setJson(string);
     String serialize = gson.toJson(message);
     return serialize.getBytes();
+  }
+
+  private void startGetDataThread(String url){
+    WebSocketClient wSC= new WebSocketClient(url);
+
+
+    Thread t= new Thread(()->{
+      while(true){
+        try {
+          sleep(900000);
+          //wSC.onOpen(ws.get());
+
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    });
   }
 }

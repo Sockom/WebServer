@@ -14,11 +14,14 @@ public class Main {
         {
             ServerSocket welcomeSocket = new ServerSocket(6969);
             System.out.println("Serveren er startet");
+            WebSocketClient webSocketClient = new WebSocketClient("wss://iotnet.cibicom.dk/app?token=vnoRiQAAABFpb3RuZXQuY2liaWNvbS5kazW4TuTywnWWgPhfHgFGHi8=");
+
+
             while(true)
             {
                 Socket connections = welcomeSocket.accept();
                 System.out.println("Klient accepteret");
-                SocketHandler socketHandler = new SocketHandler(connections);
+                SocketHandler socketHandler = new SocketHandler(connections,webSocketClient);
                 Thread t1 = new Thread(socketHandler);
                 t1.setDaemon(true);
                 t1.start();
@@ -29,4 +32,5 @@ public class Main {
             e.printStackTrace();
         }
     }
+
 }
