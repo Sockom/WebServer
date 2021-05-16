@@ -125,7 +125,7 @@ public class DBAccess
         Connection connection = getConnection();
         try {
             PreparedStatement statement = connection.prepareStatement("INSERT INTO dbo.Drivhus (DrivhusID, [Time], CO2, Temperatur, Fugtighed) VALUES ( ?, ?, ?, ?, ?)");
-
+            System.out.println("inserting data to DB");
             statement.setInt(1,id);
             statement.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
             statement.setDouble(3, co2);
@@ -308,7 +308,8 @@ private int updateStage() {
     PreparedStatement statement = null;
     try {
         statement = connection
-                .prepareStatement("\n" +
+                .prepareStatement("use [GrowBroDWH]\n" +
+                        "\n" +
                         "truncate table stage.DimDrivhus\n" +
                         "insert into stage.DimDrivhus\n" +
                         "([DrivhusID]\n" +
@@ -356,7 +357,7 @@ private int updateStage() {
                         "      ,[Temperatur]\n" +
                         "      ,[CO2]\n" +
                         "      ,[Fugtighed]\n" +
-                        "      ,[Time]\n" +
+                        "      ,dh.[Time]\n" +
                         "FROM dbo.Drivhus dh\n" +
                         "inner join dbo.ejer e\n" +
                         "on dh.UserID = e.UserID\n" +
@@ -397,25 +398,39 @@ private int updateEDWH(){
                         "      ,[PlanteScore]\n" +
                         "      ,[TemperaturKrav]\n" +
                         "      ,[CO2Krav]\n" +
-                        "      ,[FugtighedKrav])\n" +
+                        "      ,[FugtighedsKrav])\n" +
                         "SELECT  [PlanteID]\n" +
                         "      ,[Navn]\n" +
                         "      ,[PlanteScore]\n" +
                         "      ,[TemperaturKrav]\n" +
                         "      ,[CO2Krav]\n" +
-                        "      ,[FugtighedKrav]\n" +
+                        "      ,[FugtighedsKrav]\n" +
                         "FROM stage.DimPlante\n" +
                         "\n" +
                         "insert into edwh.FactManagement\n" +
-                        "([Temperatur]\n" +
-                        "\t  ,[CO2]\n" +
-                        "      ,[Fugtighed]\n" +
-                        "      ,[Time])\n" +
-                        "SELECT [Temperatur]\n" +
-                        "      ,[CO2]\n" +
-                        "      ,[Fugtighed]\n" +
-                        "      ,[Time]\n" +
-                        "FROM stage.FactManagement");
+                        "           ([DH_ID]\n" +
+                        "           ,[U_ID]\n" +
+                        "           ,[P_ID]\n" +
+                        "           ,[D_ID]\n" +
+                        "           ,[Temperatur]\n" +
+                        "           ,[CO2]\n" +
+                        "           ,[Fugtighed])\n" +
+                        "SELECT DH.[DH_ID]\n" +
+                        "           ,E.[U_ID]\n" +
+                        "           ,P.[P_ID]\n" +
+                        "           ,D.[D_ID]\n" +
+                        "           ,F.[Temperatur]\n" +
+                        "           ,F.[CO2]\n" +
+                        "           ,F.[Fugtighed]\n" +
+                        "FROM stage.FactManagement as f\n" +
+                        "inner join [edwh].DimDrivhus as dh \n" +
+                        "on DH.DrivhusID = f.DrivhusID\n" +
+                        "inner join [edwh].DimEjer as e \n" +
+                        "on E.UserID = f.UserID\n" +
+                        "inner join [edwh].DimPlante as p \n" +
+                        "on p.PlanteID = f.PlanteID\n" +
+                        "inner join [edwh].DimDate as d \n" +
+                        "on d.[Date] = f.[Time]");
         statement.execute();
     } catch (SQLException throwables) {
         return -1;
