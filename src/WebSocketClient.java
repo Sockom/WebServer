@@ -1,5 +1,4 @@
 import com.google.gson.Gson;
-import org.json.simple.JSONObject;
 
 import java.net.URI;
 import java.net.http.HttpClient;

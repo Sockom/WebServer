@@ -30,6 +30,11 @@ public class Greenhouse
     this.sensorData = sensorData;
   }
 
+  public Greenhouse()
+  {
+    sensorData = new ArrayList<>();
+  }
+
   public void AddPlant(Plant plant)
   {
      Plants.add(plant);

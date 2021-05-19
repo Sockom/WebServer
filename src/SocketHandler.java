@@ -1,4 +1,5 @@
 import com.google.gson.Gson;
+import com.google.gson.JsonSerializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,10 +9,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
+import java.util.ArrayList;
 
 public class SocketHandler implements Runnable
 {
@@ -72,10 +76,84 @@ public class SocketHandler implements Runnable
         }
         case "WATERNOW":
         {
-          wSC.sendDownLink(gson.toJson("waternow"));
+          wSC.sendDownLink(gson.toJson("waternow") +":"+message.getJson());
+          break;
         }
-
+        case "GETGREENHOUSES":
+        {
+          int userID = Integer.parseInt(message.getJson());
+          List<Greenhouse> greenhouses = dbAccess.getGreenhouses(userID);
+          String stringSerialized = gson.toJson(greenhouses);
+          byte[] bytes = sendStatus("SUCCES",stringSerialized);
+          outputStream.write(bytes,0,bytes.length);
+          break;
+        }
+        case "GETGREENHOUSEBYID":
+        {
+          String[] split = message.getJson().split(":");
+          int userID = Integer.parseInt(split[0]);
+          int greenHouseID = Integer.parseInt(split[1]);
+          Greenhouse greenhouse = dbAccess.getGreenHouseByID(userID,greenHouseID);
+          String stringSerialized = gson.toJson(greenhouse);
+          byte[] bytes = sendStatus("SUCCES",stringSerialized);
+          outputStream.write(bytes,0,bytes.length);
+          break;
+        }
+        case "GETAVERAGEDATA":
+        {
+          String[] split = message.getJson().split(":");
+          int userID = Integer.parseInt(split[0]);
+          int greenHouseID = Integer.parseInt(split[1]);
+          /*
+          *
+          *
+          *
+          *
+          * getAverageData er ikke færdig på DBAccess
+          *
+          *
+          *
+          *  */
+          ApiCurrentDataPackage apiCurrentDataPackage = dbAccess.getAverageData(userID,greenHouseID);
+          String stringSerialized = gson.toJson(apiCurrentDataPackage);
+          byte[] bytes = sendStatus("SUCCES",stringSerialized);
+          outputStream.write(bytes,0,bytes.length);
+          break;
+        }
+        case "OPENWINDOW":
+        {
+          wSC.sendDownLink(gson.toJson("openwindow")+":"+message.getJson());
+          break;
+        }
+        case "ADDGREENHOUSE":
+        {
+          Greenhouse greenhouse = gson.fromJson(message.getJson(), Greenhouse.class);
+          int greenHouseID = dbAccess.insertGreenhouseToDB(greenhouse);
+          String stringSerialized = gson.toJson(greenHouseID);
+          byte[] bytes = sendStatus("SUCCES", stringSerialized);
+          outputStream.write(bytes, 0, bytes.length);
+          break;
+        }
+        case "ADDPLANT":
+        {
+          Plant plant = gson.fromJson(message.getJson(),Plant.class);
+          int plantId = dbAccess.insertPlantToDB(plant);
+          String stringSerialized = gson.toJson(plantId);
+          byte[] bytes = sendStatus("SUCCES", stringSerialized);
+          outputStream.write(bytes, 0, bytes.length);
+          break;
+        }
+        case "ADDUSER":
+        {
+          User user = gson.fromJson(message.getJson(),User.class);
+          int userID = dbAccess.insertUserToDB(user);
+          String stringSerialized = gson.toJson(userID);
+          byte[] bytes = sendStatus("SUCCES", stringSerialized);
+          outputStream.write(bytes, 0, bytes.length);
+          break;
+        }
       }
+
     }
     catch (IOException e)
     {

@@ -16,7 +16,7 @@ public class DBAccess
 // Start of establishing connection
 
         public Connection getConnection() {
-            String dbURL = "jdbc:sqlserver://DESKTOP-SMPCJNQ\\MSSQLSERVER;user=Host;password=1234;database=GrowBroDWH";//K:SMPCJNQ Mk:P2FRPBU KH:ASU6SHH
+            String dbURL = "jdbc:sqlserver://DESKTOP-HFHHMQP\\MSSQLSERVER;user=Host;password=1234;database=GrowBroDWH";//K:SMPCJNQ Mk:P2FRPBU KH:ASU6SHH MB:HFHHMQP
             Connection connection = null;
             try {
                 connection = DriverManager.getConnection(dbURL);
@@ -153,10 +153,21 @@ public class DBAccess
             if(updateStage() == 1) {
                 updateEDWH();
             }
+            statement = connection.prepareStatement("select DrivhusID from dbo.Drivhus where Navn = ? and UserID = ?");
+            statement.setString(1,greenhouse.getName());
+            statement.setInt(2,greenhouse.getUserID());
+
+            ResultSet resultSet = statement.executeQuery();
+            int greenhouseID = 0;
+            while (resultSet.next())
+            {
+              greenhouseID = resultSet.getInt("DrivhusID");
+            }
+            return greenhouseID;
         } catch (SQLException throwables) {
-            return -1;
+            throwables.printStackTrace();
         }
-        return 1;
+        return -1;
     }
 
     public int insertPlantToDB(Plant plant){
@@ -164,17 +175,28 @@ public class DBAccess
         PreparedStatement statement = null;
         try {
             statement = connection
-            .prepareStatement("INSERT INTO dbo.Plant (Navn, DrivhusID) VALUES ( ?, ?)");
+            .prepareStatement("INSERT INTO dbo.Plante (Navn, DrivhusID) VALUES ( ?, ?)");
             statement.setString(1, plant.getName());
             statement.setInt(2, plant.getGreenHouseID());
             statement.execute();
             if(updateStage() == 1) {
                 updateEDWH();
             }
+          statement = connection.prepareStatement("select PlanteID from dbo.Plante where Navn = ? and DrivhusID = ?");
+          statement.setString(1,plant.getName());
+          statement.setInt(2,plant.getGreenHouseID());
+
+          ResultSet resultSet = statement.executeQuery();
+            int plantID = 0;
+            while (resultSet.next())
+            {
+              plantID = resultSet.getInt("PlanteID");
+            }
+            return plantID;
         } catch (SQLException throwables) {
-            return -1;
+           throwables.printStackTrace();
         }
-        return 1;
+        return -1;
     }
 
     public int insertUserToDB(User user) {
@@ -189,8 +211,20 @@ public class DBAccess
             if(updateStage() == 1) {
                 updateEDWH();
             }
+          statement = connection.prepareStatement("select UserID from dbo.Ejer where Username = ? and Password = ?");
+          statement.setString(1,user.getUsername());
+          statement.setString(2,user.getPassword());
+
+          ResultSet resultSet = statement.executeQuery();
+            int userID = 0;
+            while (resultSet.next())
+            {
+              userID = resultSet.getInt("UserID");
+            }
+            System.out.println(userID);
+            return userID;
         } catch (SQLException throwables) {
-            return -1;
+            throwables.printStackTrace();
         }
       return 1;
     }
@@ -239,6 +273,8 @@ public class DBAccess
         return 1;
     }
 
+
+
     public int updateGreenhouse(Greenhouse greenhouse) {
             Connection connection = getConnection();
             PreparedStatement statement = null;
@@ -280,6 +316,108 @@ public class DBAccess
         }
         return -1;
     }
+
+  public List<Greenhouse> getGreenhouses(int userID)
+  {
+    Connection connection = getConnection();
+    PreparedStatement statement = null;
+    try {
+      statement = connection
+          .prepareStatement("select * from dbo.Drivhus where UserID = ?");
+      statement.setInt(1,userID );
+      ResultSet r = statement.executeQuery();
+      List<Greenhouse> greenhouses = new ArrayList<>();
+      Greenhouse greenhouse = null;
+      while (r.next()){
+        greenhouse = new Greenhouse();
+        greenhouse.setGreenHouseID(r.getInt("DrivhusID"));
+        greenhouse.setName(r.getString("Navn"));
+        greenhouse.setUserID(r.getInt("UserID"));
+        SensorDataFromAndroid co2 = new SensorDataFromAndroid("CO2",r.getDouble("CO2"));
+        SensorDataFromAndroid temperature = new SensorDataFromAndroid("Temperature",r.getDouble("Temperatur"));
+        SensorDataFromAndroid fugtighed = new SensorDataFromAndroid("Humidity",r.getDouble("Fugtighed"));
+        greenhouse.getSensorData().add(co2);
+        greenhouse.getSensorData().add(temperature);
+        greenhouse.getSensorData().add(fugtighed);
+        greenhouses.add(greenhouse);
+      }
+      return greenhouses;
+    } catch (SQLException throwables) {
+      throwables.printStackTrace();
+    }
+    return null;
+  }
+
+  public Greenhouse getGreenHouseByID(int userID,int greenHouseID)
+  {
+    Connection connection = getConnection();
+    PreparedStatement statement = null;
+    try {
+      statement = connection
+          .prepareStatement("select * from dbo.Drivhus where DrivhusID = ? and UserID = ?");
+      statement.setInt(1, greenHouseID);
+      statement.setInt(2,userID);
+      ResultSet r = statement.executeQuery();
+      Greenhouse greenhouse = null;
+      if(r.next()){
+        greenhouse = new Greenhouse();
+        greenhouse.setGreenHouseID(r.getInt("DrivhusID"));
+        greenhouse.setName(r.getString("Navn"));
+        greenhouse.setUserID(r.getInt("UserID"));
+        SensorDataFromAndroid co2 = new SensorDataFromAndroid("CO2",r.getDouble("CO2"));
+        SensorDataFromAndroid temperature = new SensorDataFromAndroid("Temperature",r.getDouble("Temperatur"));
+        SensorDataFromAndroid fugtighed = new SensorDataFromAndroid("Humidity",r.getDouble("Fugtighed"));
+        greenhouse.getSensorData().add(co2);
+        greenhouse.getSensorData().add(temperature);
+        greenhouse.getSensorData().add(fugtighed);
+      }
+      return greenhouse;
+    } catch (SQLException throwables) {
+      throwables.printStackTrace();
+    }
+    return null;
+  }
+
+  public ApiCurrentDataPackage getAverageData(int userID,int greenHouseID)
+  {
+    try
+    {
+      Connection connection = getConnection();
+      PreparedStatement statement = connection
+          .prepareStatement("select * from edwh.FactManagement where U_ID = ? and DH_ID = ?");
+      statement.setInt(1, userID);
+      statement.setInt(2, greenHouseID);
+
+      ResultSet resultSet = statement.executeQuery();
+      double CO2 = 0;
+      double temperatur = 0;
+      double fugtighed = 0;
+      String D_ID;
+      List<DataContainer> list = new ArrayList<>();
+      while (resultSet.next())
+      {
+        CO2 = resultSet.getDouble("CO2");
+        temperatur = resultSet.getDouble("Temperatur");
+        fugtighed = resultSet.getDouble("Fugtighed");
+        D_ID = resultSet.getString("D_ID");
+        DataContainer CO2data = new DataContainer(CO2,DataType.CO2);
+        DataContainer temperaturData = new DataContainer(temperatur,DataType.TEMPERATURE);
+        DataContainer fugtighedData = new DataContainer(fugtighed,DataType.HUMIDITY);
+        list.add(CO2data);
+        list.add(temperaturData);
+        list.add(fugtighedData);
+      }
+      Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+      ApiCurrentDataPackage apiCurrentDataPackage = new ApiCurrentDataPackage(list,timestamp);
+      return apiCurrentDataPackage;
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
 
 
     public int getPlantID(int drivhusID){
