@@ -121,16 +121,16 @@ public class DBAccess
         }
         return 1;}
 
-    public int insertSensorDataTodbo(int id,double co2,double humidity,double temperature){
+    public int insertSensorDataTodbo(int id,int co2,int humidity,int temperature){
         Connection connection = getConnection();
         try {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO dbo.Drivhus (DrivhusID, [Time], CO2, Temperatur, Fugtighed) VALUES ( ?, ?, ?, ?, ?)");
+            PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Drivhus SET [Time]=?, CO2 = ?, Temperatur = ?, Fugtighed = ? WHERE DrivhusID =? ");
             System.out.println("inserting data to DB");
-            statement.setInt(1,id);
-            statement.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-            statement.setDouble(3, co2);
+            statement.setInt(5,id);
+            statement.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+            statement.setDouble(2, co2);
+            statement.setDouble(3, temperature);
             statement.setDouble(4, humidity);
-            statement.setDouble(5, temperature);
             statement.execute();
 
             } catch (SQLException e) {
