@@ -84,7 +84,9 @@ public class DBAccess
           passwordFromDB = resultSet.getString("Password");
         }
         user = new User(userId,usernameFromDB,passwordFromDB);
-        return user;
+        if (user.getPassword().equals(password)) {
+            return user;
+        }
       }
       catch (SQLException e)
       {
