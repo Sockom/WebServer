@@ -104,16 +104,6 @@ public class SocketHandler implements Runnable
           String[] split = message.getJson().split(":");
           int userID = Integer.parseInt(split[0]);
           int greenHouseID = Integer.parseInt(split[1]);
-          /*
-          *
-          *
-          *
-          *
-          * getAverageData er ikke færdig på DBAccess
-          *
-          *
-          *
-          *  */
           ApiCurrentDataPackage apiCurrentDataPackage = dbAccess.getAverageData(userID,greenHouseID);
           String stringSerialized = gson.toJson(apiCurrentDataPackage);
           byte[] bytes = sendStatus("SUCCES",stringSerialized);

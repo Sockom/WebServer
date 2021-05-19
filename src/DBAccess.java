@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,13 +40,21 @@ public class DBAccess
         double CO2 = 0;
         double temperatur = 0;
         double fugtighed = 0;
+        String d_id = null;
         Timestamp time = null;
         if (resultSet.next())
         {
           CO2 = resultSet.getDouble("CO2");
           temperatur = resultSet.getDouble("Temperatur");
           fugtighed = resultSet.getDouble("Fugtighed");
-          time = resultSet.getTimestamp("Time");
+          d_id = resultSet.getString("D_ID");
+        }
+        statement = connection.prepareStatement("select Date from edwh.DimDate where D_ID = ?");
+        statement.setString(1,d_id);
+        ResultSet resultSet1 = statement.executeQuery();
+        if (resultSet1.next())
+        {
+          time = resultSet1.getTimestamp("Date");
         }
         DataContainer CO2data = new DataContainer(CO2,DataType.CO2);
         DataContainer temperaturData = new DataContainer(temperatur,DataType.TEMPERATURE);
@@ -394,7 +403,8 @@ public class DBAccess
       double CO2 = 0;
       double temperatur = 0;
       double fugtighed = 0;
-      String D_ID;
+      String D_ID = null;
+      DateTimeFormatter time = null;
       List<DataContainer> list = new ArrayList<>();
       while (resultSet.next())
       {
@@ -409,8 +419,8 @@ public class DBAccess
         list.add(temperaturData);
         list.add(fugtighedData);
       }
-      Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-      ApiCurrentDataPackage apiCurrentDataPackage = new ApiCurrentDataPackage(list,timestamp);
+
+      ApiCurrentDataPackage apiCurrentDataPackage = new ApiCurrentDataPackage(list,null);
       return apiCurrentDataPackage;
     }
     catch (SQLException e)
