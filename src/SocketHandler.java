@@ -45,7 +45,7 @@ public class SocketHandler implements Runnable
       int read = inputStream.read(lenbytes, 0, lenbytes.length);
       String data = new String(lenbytes, 0, read);
       System.out.println(data);
-      //startGetDataThread("wss://iotnet.cibicom.dk/app?token=vnoRiQAAABFpb3RuZXQuY2liaWNvbS5kazW4TuTywnWWgPhfHgFGHi8=");
+      //startGetDataThread("wss://iotnet.cibicom.dk/app?token=vnoTvwAAABFpb3RuZXQuY2liaWNvbS5kazR2J0Aa7A9xrXbjCeaG1bU=");
       Message message = gson.fromJson(data, Message.class);
 
       switch(message.getCommand())

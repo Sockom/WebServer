@@ -82,14 +82,17 @@ public class WebSocketClient implements WebSocket.Listener {
     }
     //onText()
     public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
-        String idHex=data.subSequence(0,3).toString();
-        String co2Hex= data.subSequence(4,7).toString();
-        String humidityHex= data.subSequence(8,11).toString();
-        String temperatureHex= data.subSequence(12,15).toString();
-        int id= Integer.parseInt(idHex,16);
-        double co2= hexToDouble(co2Hex);
-        double humidity= hexToDouble(humidityHex);
-        double temperature= hexToDouble(temperatureHex);
+        String realData= data.toString().split("data\":\"")[1];
+        CharSequence seq= realData;
+        System.out.println(realData);
+        String idHex=seq.subSequence(0,4).toString();
+        String co2Hex= seq.subSequence(4,8).toString();
+        String humidityHex= seq.subSequence(8,12).toString();
+        String temperatureHex= seq.subSequence(12,16).toString();
+        int id= Integer.parseInt(idHex.trim(),16);
+        int co2= Integer.parseInt(co2Hex.trim(),16);
+        int humidity= Integer.parseInt(humidityHex.trim(),16);
+        int temperature= Integer.parseInt(temperatureHex.trim(),16);
         dbAccess.insertSensorDataTodbo(id,co2,humidity,temperature);
         //System.out.println(indented);
         webSocket.request(1);
