@@ -18,10 +18,15 @@ public class DBAccess
 // Start of establishing connection
 
         public Connection getConnection() {
-            String dbURL = "jdbc:sqlserver://grow-bro-db.cdkppreaz70m.us-east-2.rds.amazonaws.com\\grow-bro-db;user=admin;password=adminadmin;database=GrowBroDWH";//K:SMPCJNQ Mk:P2FRPBU KH:ASU6SHH MB:HFHHMQP
+            String dbURL = "jdbc:sqlserver://growbro.cdkppreaz70m.us-east-2.rds.amazonaws.com,1433\\growbro;user=admin;password=adminadmin;database=GrowbroDWH";//K:SMPCJNQ Mk:P2FRPBU KH:ASU6SHH MB:HFHHMQP
+            dbURL= dbURL.trim();
             Connection connection = null;
             try {
-                connection = DriverManager.getConnection(dbURL);
+                while (connection==null) {
+                    System.out.println("Connecting....");
+                    connection = DriverManager.getConnection(dbURL);
+
+                }
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
