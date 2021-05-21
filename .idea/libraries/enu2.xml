@@ -2,6 +2,7 @@
   <library name="enu">
     <CLASSES>
       <root url="file://$PROJECT_DIR$/../Libraries/sqljdbc_9.2/enu" />
+      <root url="jar://$PROJECT_DIR$/../gson-2.8.6.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
