@@ -1,3 +1,5 @@
+package main.java;
+
 import com.google.gson.Gson;
 
 import java.net.URI;
