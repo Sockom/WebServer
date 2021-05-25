@@ -10,8 +10,8 @@ public class Main {
     public static void main(String[] args) throws SQLException
     {
         SensorData sensorData = new SensorData();
-        DBAccess test = new DBAccess();
-        test.insertSensorDataTodbo(sensorData);
+        //DBAccess test = new DBAccess();
+        //test.insertSensorDataTodbo(sensorData);
         try
         {
             ServerSocket welcomeSocket = new ServerSocket(6969);
