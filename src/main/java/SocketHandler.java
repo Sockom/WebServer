@@ -76,7 +76,8 @@ public class SocketHandler implements Runnable
         }
         case "WATERNOW":
         {
-          wSC.sendDownLink(gson.toJson("waternow") +":"+message.getJson());
+          wSC.calculateVariable(1);
+         // wSC.sendDownLink(gson.toJson("waternow") +":"+message.getJson());
           break;
         }
         case "GETGREENHOUSES":
@@ -112,8 +113,13 @@ public class SocketHandler implements Runnable
         }
         case "OPENWINDOW":
         {
-          wSC.sendDownLink(gson.toJson("openwindow")+":"+message.getJson());
+          wSC.calculateVariable(3);
+          //wSC.sendDownLink(gson.toJson("openwindow")+":"+message.getJson());
           break;
+        }
+        case "CLOSEWINDOW":
+        {
+          wSC.calculateVariable(2);
         }
         case "ADDGREENHOUSE":
         {

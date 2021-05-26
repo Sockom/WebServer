@@ -16,12 +16,108 @@ public class WebSocketClient implements WebSocket.Listener {
     private Gson gson;
     private ByteBuffer fix;
     private DBAccess dbAccess;
+    private int tal = 0;
 
     // Send down-link message to device
     // Must be in Json format according to https://github.com/ihavn/IoT_Semester_project/blob/master/LORA_NETWORK_SERVER.md
     public void sendDownLink(String jsonTelegram) {
         server.sendText(jsonTelegram,true);
     }
+
+    public void calculateVariable(int variable)
+    {
+        switch(variable)
+        {
+            case 1:
+            {
+                switch(tal)
+                {
+                    case 0:
+                    {
+                        tal = variable;
+                        break;
+                    }
+                    case 1:
+                    {
+                        //do nothing
+                        break;
+                    }
+                    case 2:
+                    case 5:
+                    {
+                        tal = 5;
+                        break;
+                    }
+                    case 3:
+                    case 4:
+                    {
+                        tal = 4;
+                        break;
+                    }
+                }
+                break;
+            }
+            case 2:
+            {
+                switch(tal)
+                {
+                    case 0:
+                    {
+                        tal = variable;
+                        break;
+                    }
+                    case 1:
+                    case 4:
+                    case 5:
+                    {
+                        tal = 5;
+                        break;
+                    }
+                    case 2:
+                    {
+                        //do nothing
+                        break;
+                    }
+                    case 3:
+                    {
+                        tal = 2;
+                        break;
+                    }
+                }
+                break;
+            }
+            case 3:
+            {
+                switch(tal)
+                {
+                    case 0:
+                    {
+                        tal = variable;
+                        break;
+                    }
+                    case 1:
+                    case 4:
+                    case 5:
+                    {
+                        tal = 4;
+                        break;
+                    }
+                    case 2:
+                    {
+                        tal = 3;
+                        break;
+                    }
+                    case 3:
+                    {
+                        //do nothing
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+
 
     // E.g. url: "wss://iotnet.teracom.dk/app?token=??????????????????????????????????????????????="
     // Substitute ????????????????? with the token you have been given
@@ -41,6 +137,22 @@ public class WebSocketClient implements WebSocket.Listener {
                     e.printStackTrace();
                 }
                 server.sendPing(fix);
+            }
+        }).start();
+        new Thread(()->{
+            while(true){
+                try{
+                    Thread.sleep(600000);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                if(tal!= 0)
+                {
+                    sendDownLink(""+tal);
+                    tal = 0;
+                }
             }
         }).start();
 
