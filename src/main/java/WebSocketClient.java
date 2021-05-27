@@ -1,6 +1,7 @@
 
 import com.google.gson.Gson;
 
+import javax.swing.*;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
@@ -8,6 +9,8 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CompletableFuture;
 
@@ -17,103 +20,59 @@ public class WebSocketClient implements WebSocket.Listener {
     private ByteBuffer fix;
     private DBAccess dbAccess;
     private int tal = 0;
+    private List<Integer> list = new ArrayList<>();
+    private int windowIsOpenPrevious = 0;
 
     // Send down-link message to device
     // Must be in Json format according to https://github.com/ihavn/IoT_Semester_project/blob/master/LORA_NETWORK_SERVER.md
-    public void sendDownLink(String jsonTelegram) {
+    private void sendDownLink(String jsonTelegram) {
         server.sendText(jsonTelegram,true);
     }
 
-    public void calculateVariable(int variable)
+    private void calculateVariable(int windowIsOpen, int waterNow)
     {
-        switch(variable)
+        if(windowIsOpen == 1 && waterNow == 1)
         {
-            case 1:
+            if(windowIsOpenPrevious == windowIsOpen)
             {
-                switch(tal)
-                {
-                    case 0:
-                    {
-                        tal = variable;
-                        break;
-                    }
-                    case 1:
-                    {
-                        //do nothing
-                        break;
-                    }
-                    case 2:
-                    case 5:
-                    {
-                        tal = 5;
-                        break;
-                    }
-                    case 3:
-                    case 4:
-                    {
-                        tal = 4;
-                        break;
-                    }
-                }
-                break;
+                tal = 1;
             }
-            case 2:
+            else
             {
-                switch(tal)
-                {
-                    case 0:
-                    {
-                        tal = variable;
-                        break;
-                    }
-                    case 1:
-                    case 4:
-                    case 5:
-                    {
-                        tal = 5;
-                        break;
-                    }
-                    case 2:
-                    {
-                        //do nothing
-                        break;
-                    }
-                    case 3:
-                    {
-                        tal = 2;
-                        break;
-                    }
-                }
-                break;
+                tal = 4;
             }
-            case 3:
+        }
+        if(windowIsOpen == 0 && waterNow == 1)
+        {
+            if(windowIsOpenPrevious == windowIsOpen)
             {
-                switch(tal)
-                {
-                    case 0:
-                    {
-                        tal = variable;
-                        break;
-                    }
-                    case 1:
-                    case 4:
-                    case 5:
-                    {
-                        tal = 4;
-                        break;
-                    }
-                    case 2:
-                    {
-                        tal = 3;
-                        break;
-                    }
-                    case 3:
-                    {
-                        //do nothing
-                        break;
-                    }
-                }
-                break;
+                tal = 1;
+            }
+            else
+            {
+                tal = 5;
+            }
+        }
+        if(windowIsOpen == 1 && waterNow == 0)
+        {
+            if(windowIsOpenPrevious == windowIsOpen)
+            {
+                tal = 0;
+            }
+            else
+            {
+                tal = 3;
+            }
+        }
+        if(windowIsOpen == 0 && waterNow == 0)
+        {
+            if(windowIsOpenPrevious == windowIsOpen)
+            {
+                tal = 0;
+            }
+            else
+            {
+                tal = 2;
             }
         }
     }
@@ -148,6 +107,8 @@ public class WebSocketClient implements WebSocket.Listener {
                 {
                     e.printStackTrace();
                 }
+                list = dbAccess.getWaterNowAndWindowIsOpen();
+                calculateVariable(list.get(0), list.get(1));
                 if(tal!= 0)
                 {
                     sendDownLink(""+tal);

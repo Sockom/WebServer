@@ -592,4 +592,42 @@ private int updateEDWH(){
     }
     return 1;
         }
+
+        public List<Integer> getWaterNowAndWindowIsOpen()
+        {
+          ArrayList<Integer> list = new ArrayList<>();
+          Connection connection = getConnection();
+          PreparedStatement statement = null;
+          try {
+            statement = connection
+                .prepareStatement("select * from dbo.Drivhus");
+            ResultSet r = statement.executeQuery();
+            int windowIsOpen = 0;
+            int waterNow = 0;
+            if(r.next()){
+              windowIsOpen = r.getInt("WindowIsOpen");
+              waterNow = r.getInt("WaterNow");
+            }
+            list.add(windowIsOpen);
+            list.add(waterNow);
+          } catch (SQLException throwables) {
+            throwables.printStackTrace();
+          }
+          setWaterNow();
+          return list;
+        }
+
+        private void setWaterNow()
+        {
+          Connection connection = getConnection();
+          PreparedStatement statement = null;
+          try {
+            statement = connection
+                .prepareStatement("update dbo.Drivhus set WaterNow = 0 where WaterNow = 1");
+            statement.executeQuery();
+            }
+          catch (SQLException throwables) {
+            throwables.printStackTrace();
+          }
+        }
 }
