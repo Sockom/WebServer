@@ -117,6 +117,25 @@ public class WebSocketClient implements WebSocket.Listener {
             }
         }).start();
 
+        new Thread(()->{
+            while(true){
+                if(dbAccess.incrementalLoad()==-1){
+                    System.out.println("fault in incrementalLoad");
+                }
+                else {
+                    System.out.println("success in incrementalLoad");
+                }
+                try{
+                    Thread.sleep(300000);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+
         System.out.println("past");
 
     }
@@ -167,7 +186,11 @@ public class WebSocketClient implements WebSocket.Listener {
         int co2= Integer.parseInt(co2Hex.trim(),16);
         int humidity= Integer.parseInt(humidityHex.trim(),16);
         int temperature= Integer.parseInt(temperatureHex.trim(),16);
-        dbAccess.insertSensorDataTodbo(id,co2,humidity,temperature);
+        if(co2!=0 || humidity!=0 || temperature!=0){
+            System.out.println("Working data inserted");
+            dbAccess.insertSensorDataTodbo(id,co2,humidity,temperature);
+        }
+
         //System.out.println(indented);
         webSocket.request(1);
         return new CompletableFuture().completedFuture("onText() completed.").thenAccept(System.out::println);
