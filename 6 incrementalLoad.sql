@@ -83,7 +83,7 @@ from stage.FactManagement as F
 left join edwh.DimEjer as U on U.UserID = F.UserID
 left join edwh.DimDrivhus as DH on DH.DrivhusID = F.DrivhusID
 left join edwh.DimPlante as P on P.PlanteID = F.PlanteID
-left join edwh.DimDate as D on D.Date = F.[Time]
+left join edwh.DimDate as D on D.Date = Cast(F.[time] AS DATE)
 where U.validTo = '9999-12-31 23:59:59' and DH.validTo = '9999-12-31 23:59:59' and P.validTo = '9999-12-31 23:59:59';
 
 
