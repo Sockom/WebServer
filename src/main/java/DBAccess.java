@@ -1,4 +1,10 @@
 
+import org.apache.ibatis.jdbc.ScriptRunner;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.Reader;
 import java.sql.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -34,105 +40,31 @@ public class DBAccess
 
         public int incrementalLoad(){
             Connection connection = getConnection();
-            try {
                 System.out.println("creating statement for incremental load");
-            PreparedStatement statement = connection.prepareStatement("use GrowBroDWH " +
-                    "declare @lastLoadDate DateTime\n" +
-                    "declare @newLoadDate DateTime\n" +
-                    "declare @futureDate DateTime\n" +
-                    "set @newLoadDate = convert(char(25), getDate(), 113) " +
-                    "set @futureDate = '9999-12-31 23:59:59'\n" +
-                    "--DimEjer\n" +
-                    "set @lastLoadDate = (select max(LoadDate) from etl.logUpdate where [table] = 'DimEjer')\n" +
-                    "\n" +
-                    "insert into edwh.DimEjer(UserID,Username,validFrom,validTo) select UserID,Username,@newLoadDate,@futureDate from stage.DimEjer --add new data\n" +
-                    "where UserID in (select UserID from stage.DimEjer except select UserID from edwh.DimEjer where validTo = '9999-12-31 23:59:59')\n" +
-                    "\n" +
-                    "select UserID, Username into #tmp from stage.DimEjer except select UserID,Username from edwh.DimEjer where validTo= '9999-12-31 23:59:59'--edit changed data\n" +
-                    "except select UserID,Username from stage.DimEjer where UserID in (select UserID from stage.DimEjer except select UserID from edwh.DimEjer where validTo = '9999-12-31 23:59:59')\n" +
-                    "\n" +
-                    "insert into edwh.DimEjer(UserID,Username,validFrom,validTo) select UserID,Username,@newLoadDate,@futureDate from #tmp\n" +
-                    "update edwh.DimEjer set validTo=@newLoadDate-1\n" +
-                    "where UserID in (select UserID from #tmp) and edwh.DimEjer.validFrom<@newLoadDate\n" +
-                    "drop table if exists #tmp\n" +
-                    "\n" +
-                    "\n" +
-                    "update edwh.DimEjer set validTo=@newLoadDate-1 where UserID in (select UserID from edwh.DimEjer where UserID in (select UserID from edwh.DimEjer except select UserID from stage.DimEjer)) -- delete deleted data\n" +
-                    "and \n" +
-                    "validTo = '9999-12-31 23:59:59'\n" +
-                    "\n" +
-                    "insert into etl.logUpdate ([Table],LoadDate) values('DimEjer',@newLoadDate)\n" +
-                    "\n" +
-                    "\n" +
-                    "\n" +
-                    "\n" +
-                    "\n" +
-                    "--DimPlante\n" +
-                    "set @lastLoadDate = (select max(LoadDate) from etl.logUpdate where [table] = 'DimPlante')\n" +
-                    "\n" +
-                    "insert into edwh.DimPlante(PlanteID,Navn,PlanteScore,TemperaturKrav,CO2Krav,FugtighedsKrav,validFrom,validTo) select PlanteID,Navn,PlanteScore,TemperaturKrav,CO2Krav,FugtighedsKrav,@newLoadDate,@futureDate\n" +
-                    "from stage.DimPlante --add new data\n" +
-                    "where PlanteID in (select PlanteID from stage.DimPlante except select PlanteID from edwh.DimPlante where validTo = '9999-12-31 23:59:59')\n" +
-                    "\n" +
-                    "select PlanteID,Navn,PlanteScore,TemperaturKrav,CO2Krav,FugtighedsKrav into #tmps from stage.DimPlante except select PlanteID,Navn,PlanteScore,TemperaturKrav,CO2Krav,FugtighedsKrav from edwh.DimPlante where validTo= '9999-12-31 23:59:59'--edit changed data\n" +
-                    "except select PlanteID,Navn,PlanteScore,TemperaturKrav,CO2Krav,FugtighedsKrav from stage.DimPlante where PlanteID in (select PlanteID from stage.DimPlante except select PlanteID from edwh.DimPlante where validTo = '9999-12-31 23:59:59')\n" +
-                    "\n" +
-                    "insert into edwh.DimPlante(PlanteID,Navn,PlanteScore,TemperaturKrav,CO2Krav,FugtighedsKrav,validFrom,validTo) select PlanteID,Navn,PlanteScore,TemperaturKrav,CO2Krav,FugtighedsKrav,@newLoadDate,@futureDate from #tmps\n" +
-                    "update edwh.DimPlante set validTo=@newLoadDate-1\n" +
-                    "where PlanteID in (select PLanteID from #tmps) and edwh.DimPlante.validFrom<@newLoadDate\n" +
-                    "drop table if exists #tmps\n" +
-                    "\n" +
-                    "\n" +
-                    "update edwh.DimPlante set validTo=@newLoadDate-1 where PlanteID in (select PlanteID from edwh.DimPlante where PlanteID in (select PlanteID from edwh.DimPlante except select PlanteID from stage.DimPlante)) -- delete deleted data\n" +
-                    "and \n" +
-                    "validTo = '9999-12-31 23:59:59'\n" +
-                    "\n" +
-                    "insert into etl.logUpdate ([Table],LoadDate) values('DimPlante',@newLoadDate)\n" +
-                    "\n" +
-                    "\n" +
-                    "\n" +
-                    "--DimDrivhus\n" +
-                    "set @lastLoadDate = (select max(LoadDate) from etl.logUpdate where [table] = 'DimDrivhus')\n" +
-                    "\n" +
-                    "insert into edwh.DimDrivhus(DrivhusID,Navn,validFrom,validTo) select DrivhusID,Navn,@newLoadDate,@futureDate\n" +
-                    "from stage.DimDrivhus --add new data\n" +
-                    "where DrivhusID in (select DrivhusID from stage.DimDrivhus except select DrivhusID from edwh.DimDrivhus where validTo = '9999-12-31 23:59:59')\n" +
-                    "\n" +
-                    "select DrivhusID,Navn into #temp from stage.DimDrivhus except select DrivhusID,Navn from edwh.DimDrivhus where validTo= '9999-12-31 23:59:59'--edit changed data\n" +
-                    "except select DrivhusID,Navn from stage.DimDrivhus where DrivhusID in (select DrivhusID from stage.DimDrivhus except select DrivhusID from edwh.DimDrivhus where validTo = '9999-12-31 23:59:59')\n" +
-                    "\n" +
-                    "insert into edwh.DimDrivhus(DrivhusID,Navn,validFrom,validTo) select DrivhusID,Navn,@newLoadDate,@futureDate from #temp\n" +
-                    "update edwh.DimDrivhus set validTo=@newLoadDate-1\n" +
-                    "where DrivhusID in (select DrivhusID from #temp) and edwh.DimDrivhus.validFrom<@newLoadDate\n" +
-                    "drop table if exists #temp\n" +
-                    "\n" +
-                    "\n" +
-                    "update edwh.DimDrivhus set validTo=@newLoadDate-1 where DrivhusID in (select drivhusID from edwh.DimPlante where DrivhusID in (select DrivhusID from edwh.DimDrivhus except select DrivhusID from stage.DimDrivhus)) -- delete deleted data\n" +
-                    "and \n" +
-                    "validTo = '9999-12-31 23:59:59'\n" +
-                    "\n" +
-                    "insert into etl.logUpdate ([Table],LoadDate) values('DimDrivhus',@newLoadDate)\n" +
-                    "\n" +
-                    "\n" +
-                    "\n" +
-                    "--FactManagement\n" +
-                    "truncate table edwh.FactManagement\n" +
-                    "insert into edwh.FactManagement(DH_ID,U_ID,P_ID,D_ID,Temperatur,CO2,Fugtighed) select DH.DH_ID,U.U_ID,P.P_ID,D.D_ID,F.Temperatur,F.CO2,F.Fugtighed\n" +
-                    "from stage.FactManagement as F\n" +
-                    "left join edwh.DimEjer as U on U.UserID = F.UserID\n" +
-                    "left join edwh.DimDrivhus as DH on DH.DrivhusID = F.DrivhusID\n" +
-                    "left join edwh.DimPlante as P on P.PlanteID = F.PlanteID\n" +
-                    "left join edwh.DimDate as D on D.Date = F.[Time]\n" +
-                    "where U.validTo = '9999-12-31 23:59:59' and DH.validTo = '9999-12-31 23:59:59' and P.validTo = '9999-12-31 23:59:59'\n" +
-                    "\n");
-                System.out.println("executing incremental load");
-                statement.execute();
-
-            } catch (SQLException throwables) {
+            ScriptRunner runner = new ScriptRunner(connection);
+            try {
+                Reader reader = new BufferedReader(new FileReader("6 incrementalLoad.sql"));
+                runner.runScript(reader);
+            } catch (FileNotFoundException e) {
                 return -1;
             }
+
             return 1;
         }
+    public int dboToStage(){
+        Connection connection = getConnection();
+        System.out.println("creating statement for incremental load");
+        ScriptRunner runner = new ScriptRunner(connection);
+        try {
+            Reader reader = new BufferedReader(new FileReader("5 Growbro dbo til stage.sql"));
+            runner.runScript(reader);
+        } catch (FileNotFoundException e) {
+            return -1;
+        }
+
+        return 1;
+    }
+
     public ApiCurrentDataPackage DBGetCurrentData(int userID, int greenhouseid){
 
       try
@@ -726,7 +658,7 @@ private int updateEDWH(){
           try {
             statement = connection
                 .prepareStatement("update dbo.Drivhus set WaterNow = 0 where WaterNow = 1");
-            statement.executeQuery();
+            statement.execute();
             }
           catch (SQLException throwables) {
             throwables.printStackTrace();

@@ -117,14 +117,18 @@ public class WebSocketClient implements WebSocket.Listener {
             }
         }).start();
 
-        new Thread(()->{
+       new Thread(()->{
             while(true){
-                if(dbAccess.incrementalLoad()==-1){
-                    System.out.println("fault in incrementalLoad");
+                if(dbAccess.dboToStage()==1){
+                    boolean d= dbAccess.incrementalLoad()==-1;
+                    if(d){
+                        System.out.println("fault in incrementalLoad");
+                    }
+                    else {
+                        System.out.println("success in incrementalLoad");
+                    }
                 }
-                else {
-                    System.out.println("success in incrementalLoad");
-                }
+
                 try{
                     Thread.sleep(300000);
                 }
@@ -135,6 +139,7 @@ public class WebSocketClient implements WebSocket.Listener {
 
             }
         }).start();
+
 
         System.out.println("past");
 
